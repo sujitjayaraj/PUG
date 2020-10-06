@@ -20,10 +20,10 @@ More information about PUG as well as research behind it can be found at UCDBG [
 
 # Documentation (Wiki Links)
 
-* [Installation guide](https://github.com/UCDBG/PUG/wiki/installation)
+* [Installation and Set-up Guide](https://github.com/UCDBG/PUG/wiki/installation)
+* [Provenance Graphs](https://github.com/UCDBG/PUG/wiki/provenancegraphs)
 * [Tutorial](https://github.com/UCDBG/PUG/wiki/tutorial)
 * [Docker containers](https://github.com/UCDBG/PUG/wiki/docker)
-* [Provenance Graphs for Datalog](https://github.com/UCDBG/PUG/wiki/datalog_prov)
 
 <!-- 
 # Features
