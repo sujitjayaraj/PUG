@@ -14,7 +14,7 @@ source ${DIR}/pug_basic.sh
 #########################################
 # PARAMETERS
 PROGRAM="${2}"
-LOG="${1}"
+LOG="-log -loglevel ${1}"
 
 if [ $# -lt 2 ]; then
 	echo "Description: translate Datalog program with provenance requests and regular path queries into SQL."
@@ -24,11 +24,15 @@ if [ $# -lt 2 ]; then
 fi
 ########################################
 # RUN COMMAND
+POSTGRES=""
+
+# RUN COMMAND
 if [[ ${CONNECTION_PARAMS} == *"oracle"* ]]; then
-	${PUG} ${LOG} -sql "${PROGRAM}" ${CONNECTION_PARAMS} -Boracle.servicename TRUE ${PUG_DL_PLUGINS} -Pexecutor sql -Cattr_reference_consistency FALSE -Cschema_consistency FALSE  -Cunique_attr_names FALSE -treeify-algebra-graphs FALSE ${*:3}
+	ORACLE="-Boracle.servicename TRUE"
+else
+	ORACLE=${POSTGRES}
 fi
 
-if [[ ${CONNECTION_PARAMS} == *"postgres"* ]]; then
-	${PUG} ${LOG} -sql "${PROGRAM}" ${CONNECTION_PARAMS} ${PUG_DL_PLUGINS} -Pexecutor sql -Cattr_reference_consistency FALSE -Cschema_consistency FALSE  -Cunique_attr_names FALSE -treeify-algebra-graphs FALSE ${*:3}
-fi
+
+${PUG} ${LOG} -sql "${PROGRAM}" ${CONNECTION_PARAMS} ${ORACLE} ${PUG_DL_PLUGINS} -Pexecutor sql -Cattr_reference_consistency FALSE -Cschema_consistency FALSE  -Cunique_attr_names FALSE -treeify-algebra-graphs FALSE ${*:3}
 

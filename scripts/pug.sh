@@ -13,5 +13,13 @@ PUG_CONF=${DIR}/../${CONF_FILE}
 # READ USER CONFIGUATION
 source ${DIR}/pug_basic.sh
 #######################################
+POSTGRES=""
+
 # RUN COMMAND
-${PUG} ${LOG} ${CONNECTION_PARAMS} -Boracle.servicename TRUE ${PUG_DL_PLUGINS} -treeify-algebra-graphs ${*}
+if [[ ${CONNECTION_PARAMS} == *"oracle"* ]]; then
+	ORACLE="-Boracle.servicename TRUE"
+else
+	ORACLE=${POSTGRES}
+fi
+
+${PUG} ${LOG} ${CONNECTION_PARAMS} ${ORACLE} ${PUG_DL_PLUGINS} -treeify-algebra-graphs FALSE ${*}

@@ -29,13 +29,18 @@ fi
 # RUN COMMAND
 ##########
 echo "-- compute edge relation of provenance graph"
+
+POSTGRES=""
+
+# RUN COMMAND
 if [[ ${CONNECTION_PARAMS} == *"oracle"* ]]; then
-	${PUG} 0 -sql "${PROGRAM}" ${CONNECTION_PARAMS} -Boracle.servicename TRUE ${PUG_DL_PLUGINS} -Pexecutor gp -Cattr_reference_consistency FALSE -Cschema_consistency FALSE  -Cunique_attr_names FALSE ${*:3} > ${DOTFILE}
+	ORACLE="-Boracle.servicename TRUE"
+else
+	ORACLE=${POSTGRES}
 fi
 
-if [[ ${CONNECTION_PARAMS} == *"postgres"* ]]; then
-	${PUG} 0 -sql "${PROGRAM}" ${CONNECTION_PARAMS} ${PUG_DL_PLUGINS} -Pexecutor gp -Cattr_reference_consistency FALSE -Cschema_consistency FALSE  -Cunique_attr_names FALSE ${*:3} > ${DOTFILE}
-fi
+${PUG} 0 -sql "${PROGRAM}" ${CONNECTION_PARAMS} ${ORACLE} ${PUG_DL_PLUGINS} -Pexecutor gp -Cattr_reference_consistency FALSE -Cschema_consistency FALSE  -Cunique_attr_names FALSE ${*:3} > ${DOTFILE}
+
 ##########
 echo "-- run graphviz on ${DOTFILE} to produce PDF file ${PDFFILE}"
 dot -Tpdf -o ${PDFFILE} ${DOTFILE}
