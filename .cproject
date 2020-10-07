@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="cdt.managedbuild.config.bupc.exe.macosx.debug.535894313">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.bupc.exe.macosx.debug.535894313" moduleId="org.eclipse.cdt.core.settings" name="Debug">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.MachO64" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.autotools.core.ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.errorparsers.xlc.XlcErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="Debug configuration" id="cdt.managedbuild.config.bupc.exe.macosx.debug.535894313" name="Debug" optionalBuildProperties="" parent="cdt.managedbuild.config.bupc.exe.macosx.debug">
+					<folderInfo id="cdt.managedbuild.config.bupc.exe.macosx.debug.535894313." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.bupc.exe.macosx.debug.831265921" name="MacOSX Berkeley UPC" superClass="cdt.managedbuild.toolchain.bupc.exe.macosx.debug">
+							<targetPlatform id="cdt.managedbuild.target.bupc.platform.exe.macosx.debug.1655100656" name="Debug Platform" superClass="cdt.managedbuild.target.bupc.platform.exe.macosx.debug"/>
+							<builder buildPath="${workspace_loc:/PUGucdbg}/Debug" id="org.eclipse.cdt.managedbuilder.bupc.builder.exe.macosx.debug.1966465498" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="org.eclipse.cdt.managedbuilder.bupc.builder.exe.macosx.debug"/>
+							<tool id="org.eclipse.cdt.managedbuild.tool.bupc.compiler.exe.macosx.debug.2011822821" name="Berkeley UPC Compiler" superClass="org.eclipse.cdt.managedbuild.tool.bupc.compiler.exe.macosx.debug">
+								<option defaultValue="true" id="bupc.ui.compiler.exe.macosx.debug.option.debug.1033513794" name="Debug" superClass="bupc.ui.compiler.exe.macosx.debug.option.debug" valueType="boolean"/>
+								<inputType id="cdt.managedbuild.tool.bupc.compiler.input.1668302116" name="UPC sources" superClass="cdt.managedbuild.tool.bupc.compiler.input"/>
+							</tool>
+							<tool id="org.eclipse.cdt.managedbuild.tool.bupc.linker.exe.macosx.debug.1973785374" name="Berkeley UPC Linker" superClass="org.eclipse.cdt.managedbuild.tool.bupc.linker.exe.macosx.debug">
+								<option defaultValue="true" id="bupc.ui.linker.exe.macosx.debug.option.debug.1657703325" name="Debug" superClass="bupc.ui.linker.exe.macosx.debug.option.debug" valueType="boolean"/>
+								<inputType id="cdt.managedbuild.tool.bupc.linker.input.1581367502" superClass="cdt.managedbuild.tool.bupc.linker.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.config.bupc.exe.macosx.release.1118372703">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.bupc.exe.macosx.release.1118372703" moduleId="org.eclipse.cdt.core.settings" name="Release">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.MachO64" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.autotools.core.ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.errorparsers.xlc.XlcErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="Release configuration" id="cdt.managedbuild.config.bupc.exe.macosx.release.1118372703" name="Release" parent="cdt.managedbuild.config.bupc.exe.macosx.release">
+					<folderInfo id="cdt.managedbuild.config.bupc.exe.macosx.release.1118372703." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.bupc.exe.macosx.release.630500560" name="MacOSX Berkeley UPC" superClass="cdt.managedbuild.toolchain.bupc.exe.macosx.release">
+							<targetPlatform id="cdt.managedbuild.target.bupc.platform.exe.macosx.release.375748983" name="Debug Platform" superClass="cdt.managedbuild.target.bupc.platform.exe.macosx.release"/>
+							<builder buildPath="${workspace_loc:/PUGucdbg}/Release" id="org.eclipse.cdt.managedbuilder.bupc.builder.exe.macosx.release.1955009427" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="org.eclipse.cdt.managedbuilder.bupc.builder.exe.macosx.release"/>
+							<tool id="org.eclipse.cdt.managedbuild.tool.bupc.compiler.exe.macosx.release.508175776" name="Berkeley UPC Compiler" superClass="org.eclipse.cdt.managedbuild.tool.bupc.compiler.exe.macosx.release">
+								<inputType id="cdt.managedbuild.tool.bupc.compiler.input.1830546676" name="UPC sources" superClass="cdt.managedbuild.tool.bupc.compiler.input"/>
+							</tool>
+							<tool id="org.eclipse.cdt.managedbuild.tool.bupc.linker.exe.macosx.release.579368804" name="Berkeley UPC Linker" superClass="org.eclipse.cdt.managedbuild.tool.bupc.linker.exe.macosx.release">
+								<inputType id="cdt.managedbuild.tool.bupc.linker.input.1784366329" superClass="cdt.managedbuild.tool.bupc.linker.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="PUGucdbg.cdt.managedbuild.target.bupc.macosx.exe.1857943806" name="Executable" projectType="cdt.managedbuild.target.bupc.macosx.exe"/>
+	</storageModule>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
+</cproject>

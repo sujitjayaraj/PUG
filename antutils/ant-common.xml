@@ -1,0 +1,1247 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project
+	name="ant-common" 
+	basedir="."
+	xmlns:ivy="antlib:org.apache.ivy.ant"
+	xmlns:artifact="antlib:org.apache.maven.artifact.ant"
+	xmlns:if="ant:if"
+    xmlns:unless="ant:unless"
+>	
+	<!-- fail if ant version too old -->
+	<macrodef name="check-ant-version"
+		description="check that ant is new enough">
+		
+		<attribute name="required-version" default=""/>
+		<attribute name="message" default="" />
+		
+		<sequential>
+			<local name="macros.required.version" />
+			<local name="provided.version" />
+			
+			<property name="macros.required.version" value="1.9.1" />
+			
+		    <antversion property="ant.version.running" />
+			
+		    <fail message="FATAL ERROR:  The running Ant version, ${ant.version.running}, is too old to support features used in ant-common.xml macros.">
+		        <condition>
+		            <not>
+		                <antversion atleast="${macros.required.version}" />
+		            </not>
+		        </condition>
+		    </fail>			
+			
+			<set-prop-if-not-empty arg="@{required-version}" propname="provided.version" />
+			
+			<sequential if:set="provided.version">
+			    <fail message="FATAL ERROR:  The running Ant version, ${ant.version.running}, need @{required-version} to build. @{message}">
+			        <condition>
+			            <not>
+			                <antversion atleast="@{required-version}" />
+			            </not>
+			        </condition>
+			    </fail>
+			</sequential>
+			<echo message="ANT VERSION: ${ant.version.running}" />
+		</sequential>
+	</macrodef>
+	
+	<!-- set property if file contains string -->
+	<macrodef name="file-contains-string"
+			description="sets a property if file contains a search string">
+		
+		<attribute name="file" />
+		<attribute name="substring" />
+		<attribute name="propname" />
+		<attribute name="casesensitive" default="yes" />
+		
+		<sequential>
+			<fail-if-empty arg="@{file}" />
+			<fail-if-empty arg="@{pattern}" />
+			<fail-if-empty arg="@{propname}" />
+			
+			<condition property="@{propname}">
+				<resourcecontains 
+					resource="@{file}" 
+					substring="@{substring}"
+					casesensitive="@{casesensitive}" />
+			</condition>
+			<fileset id="contains.pattern" dir="${log.dir}" includes="*.log">
+			    <contains text="${fail.string}"/>
+			</fileset>
+			
+		</sequential>
+	</macrodef>
+	
+	<!-- fails if value is empty -->
+	<macrodef name="fail-if-empty"
+		description="fail if argument is empty">
+		
+		<attribute name="arg"/>
+		<attribute name="message" default="" />
+		<attribute name="trim" default="yes" />
+		
+		<sequential>
+			<fail message="@{message}">
+				<condition>
+					<equals arg1="@{arg}" arg2="" trim="@{trim}" />
+				</condition>
+			</fail>
+		</sequential>
+	</macrodef>
+	
+	<!-- fails if dir does not exist -->
+	<macrodef name="fail-not-exists"
+		description="fail if dir (default) or file does not exist">
+		
+		<attribute name="arg"/>
+		<attribute name="message" default="" />
+		<attribute name="trim" default="yes" />
+		<attribute name="type" default="dir" />
+		<sequential>
+			<fail message="@{message}">
+				<condition>
+					<equals arg1="@{arg}" arg2="" trim="@{trim}" />
+				</condition>
+			</fail>
+			<fail message="@{message}">
+				<condition>
+					<not>
+						<available file="@{arg}" type="@{type}"/>
+					</not>
+				</condition>
+			</fail>
+		</sequential>
+	</macrodef>
+	
+	<!-- fails if dir does not exist -->
+	<macrodef name="set-prop-if-exists"
+		description="set a property if dir (default) or file does not exist">
+		
+		<attribute name="file"/>
+		<attribute name="message" default="" />
+		<attribute name="failmessage" default="" />
+		<attribute name="trim" default="yes" />
+		<attribute name="type" default="dir" />
+		<attribute name="propname" />
+		
+		<sequential>
+			<local name="have.message" />
+			<local name="have.failmessage" />
+			
+			<set-prop-if-not-empty arg="@{message}" propname="have.message"/>
+			<set-prop-if-not-empty arg="@{failmessage}" propname="have.failmessage"/>
+			
+			<condition property="@{propname}">
+				<available file="@{file}" type="@{type}"/>
+			</condition>
+			
+			<sequential if:set="@{propname}">
+				<echo if:set="have.message" message="@{message}" />
+			</sequential>
+			
+			<sequential unless:set="@{propname}">
+				<echo if:set="have.failmessage" message="@{failmessage}" />
+			</sequential>
+		</sequential>
+	</macrodef>
+	
+	<!-- fail if an executable is not available -->
+	<macrodef name="fail-if-bin-not-exists"
+			description="Check if a binary is available and fail if it does not exist.">
+		<attribute name="bin" default=""/>
+		<attribute name="message" default="" />
+		<sequential>
+			<fail-if-empty arg="@{bin}" />
+			<local name="bin.exists" />
+			
+			<property environment="env" /> 
+			<available file="@{bin}"  
+					filepath="${env.PATH}"  
+					property="bin.exists"/>
+			
+			<fail message="did not fine @{bin}: @{message}">
+				<condition>
+					<not><isset property="bin.exists" /></not>
+				</condition>
+			</fail>
+		</sequential>
+	</macrodef>
+	
+	<!-- print fileset -->
+	<macrodef name="print-fileset"
+			description="print the contents of a fileset">
+		
+		<attribute name="filesetid" default=""/>
+		
+		<sequential>
+			<fail-if-empty arg="@{filesetid}" />
+		
+			<local name="additional.resources" />
+			
+		    <!-- Format path -->
+		    <pathconvert pathsep="${line.separator}   - "
+		    		property="additional.resources">
+					<path>
+				   		<fileset refid="@{filesetid}" />
+				    </path>
+		    </pathconvert>
+			<echo message="files:${line.separator}   - ${additional.resources}${line.separator}" />	
+		</sequential>
+	</macrodef>
+	
+	<!-- print a path -->
+	<macrodef name="print-path"
+			description="print the contents of a path">
+		<attribute name="pathid" default="" />
+		
+		<sequential>
+			<fail-if-empty arg="@{pathid}" />
+		
+			<local name="additional.resources" />
+			
+		    <!-- Format path -->
+		    <pathconvert pathsep="${line.separator}   - "
+		    		property="additional.resources">
+					<path refid="@{pathid}" />
+		    </pathconvert>
+			<echo message="path elements:${line.separator}   - ${additional.resources}${line.separator}" />	
+		</sequential>
+	</macrodef>
+	
+	<!-- define task -->
+	<macrodef name="define-task" 
+		description="load an ant task">
+		
+		<attribute name="classpath" default="" />
+		<attribute name="classpathref" default="" />
+		<attribute name="classname"/>
+		<attribute name="name"/>
+		
+		<sequential>
+			<local name="use.ref" />
+			
+			<fail-if-empty arg="@{classname}"/>
+			<fail-if-empty arg="@{name}"/>
+			
+			<set-prop-if-not-empty arg="@{classpathref}" propname="use-ref" />
+			<set-prop-if-not-empty arg="@{name}" propname="use-name" />
+			
+			<!-- use classpathref -->
+			<sequential unless:set="use.ref">
+				<echo message=" - define task @{name} - @{classname} - classpathref=@{classpathref}"/>
+			    <taskdef 
+			    		name="@{name}"
+			    		classname="@{classname}" 
+			        classpathref="@{classpathref}" 
+			    		onerror="report"/>
+			</sequential>
+			
+			<!-- use classpath -->
+			<sequential if:set="use.ref">
+				<echo message=" - define task @{name} - @{classname} - classpath=@{classpath}"/>
+			    <taskdef 
+			    		name="@{name}"
+			    		classname="@{classname}" 
+			        classpath="@{classpath}" 
+			    		onerror="report"/>
+			</sequential>
+		</sequential>
+	</macrodef>
+	
+	<!-- create dir if empty string -->
+	<macrodef name="mkdir-if-not-empty"
+		description="create directory unless the argument is empty">
+		
+		<attribute name="dir" default="" />
+		<attribute name="message" default="" />
+		<attribute name="trim" default="yes" />
+		
+		<sequential>
+			<local name="is-empty" />
+			
+			<condition property="is-empty">
+				<or>
+					<equals arg1="@{dir}" arg2="" trim="@{trim}" />
+					<contains string="@{dir}" substring="$$" />
+				</or>
+			</condition>
+			
+			<sequential unless:set="is-empty">
+				<echo message="create if does not exist: @{dir}" />
+				<mkdir dir="@{dir}"/>
+			</sequential>
+			
+		</sequential>
+	</macrodef>
+	
+	<!-- set prop if not empty -->
+	<macrodef name="set-prop-if-not-empty"
+		description="set a property if the argument is not empty">
+		
+		<attribute name="arg"/>
+		<attribute name="propname" />
+		<attribute name="trim" default="yes" />
+		
+		<sequential>
+			<condition property="@{propname}">
+				<not>
+					<equals arg1="@{arg}" arg2="" trim="@{trim}" />
+				</not>
+			</condition>
+		</sequential>
+	</macrodef>
+	
+	<!-- cleans the contents of one directory if it exists -->
+	<macrodef name="clean-dir-if-exists"
+			description="delete the contents of directory if it exists">
+		<attribute name="dir"/>
+		<sequential>
+			<local name="dir.exists" />
+			<!-- set properties based on parameters -->
+			<condition property="dir.exists">
+				<and>
+					<not>
+						<equals arg1="@{dir}" arg2="" trim="yes"/>
+					</not>
+					<available file="@{dir}" type="dir"/>
+				</and>
+			</condition>
+			<sequential if:set="dir.exists">
+				<echo message="delete contents of @{dir}" />
+				<delete includeemptydirs="true">
+					<fileset dir="@{dir}" includes="**/*"/>
+				</delete>
+			</sequential>
+		</sequential>
+	</macrodef>
+	
+	<!-- set default directory properties -->
+	<macrodef name="set-default-props"
+			description="set default directory properties">
+		<sequential>
+			<property name="dir.source" location="${basedir}/src" />
+			<property name="dir.bin" location="${basedir}/bin" />
+			<property name="dir.test.bin" location="${basedir}/testbin" />
+			<property name="dir.build" location="${basedir}/build" />
+			<property name="dir.javadoc" location="${basedir}/doc" />
+			<property name="dir.resource" location="${basedir}/resource" />
+			<property name="dir.library" location="${basedir}/lib" />
+			<property name="dir.buildlib" location="${dir.build}/libbuild" />
+			<property name="dir.buildresource" location="${basedir}/buildresource" />
+			<property name="dir.mvn" value="${dir.build}/mvn" />
+			<property name="dir.mvnlib" value="${dir.mvn}/lib" />
+		</sequential>
+	</macrodef>
+	
+	<!-- create basic build dirs -->
+	<macrodef name="create-build-dirs"
+			description="create standard build directories">
+		
+		<attribute name="dir.bin" default="${dir.bin}" />
+		<attribute name="dir.build" default="${dir.build}" />
+		<attribute name="dir.buildlib" default="${dir.buildlib}" />
+		<attribute name="dir.mvn" default="${dir.mvn}" />
+		<attribute name="dir.mvnlib" default="${dir.mvnlib}" />
+		<attribute name="dir.deploy" default="${dir.deploy}" />
+		
+		<sequential>
+			<mkdir-if-not-empty dir="@{dir.bin}" />
+			<mkdir-if-not-empty dir="@{dir.build}" />
+			<mkdir-if-not-empty dir="@{dir.buildlib}" />
+			<mkdir-if-not-empty dir="@{dir.mvn}"/>
+			<mkdir-if-not-empty dir="@{dir.mvnlib}"/>
+			<mkdir-if-not-empty dir="@{dir.deploy}" />
+		</sequential>
+	</macrodef>
+		
+	<!-- create basic build dirs -->
+	<macrodef name="clean-build-dirs"
+		description="clean all build directories">
+		
+		<attribute name="dir.bin" default="${dir.bin}" />
+		<attribute name="dir.build" default="${dir.build}" />
+		<attribute name="dir.buildlib" default="${dir.buildlib}" />
+		<attribute name="dir.mvn" default="${dir.mvn}" />
+		<attribute name="dir.mvnlib" default="${dir.mvnlib}" />
+		<attribute name="dir.deploy" default="${dir.deploy}" />
+		<attribute name="dir.test.bin" default="${dir.test.bin}" />
+		
+		<sequential>
+			<echo message="**********************************************************"/>
+			<echo message="*  CLEAN ALL "/>
+			<echo message="**********************************************************"/>
+			<echo message="dir.bin = '@{dir.bin}'" />
+			<echo message="dir.build = '@{dir.build}'" />
+			<echo message="dir.buildlib = '@{dir.buildlib}'" />
+			<echo message="dir.mvn = '@{dir.mvn}'" />
+			<echo message="dir.mvnlib = '@{dir.mvnlib}'" />
+			<echo message="dir.deploy = '@{dir.deploy}'" />
+			<echo message="dir.test.bin = '@{dir.test.bin}'" />
+			
+			<clean-dir-if-exists dir="@{dir.bin}"/>
+			<clean-dir-if-exists dir="@{dir.build}"/>
+			<clean-dir-if-exists dir="@{dir.buildlib}"/>
+			<clean-dir-if-exists dir="@{dir.mvn}"/>
+			<clean-dir-if-exists dir="@{dir.mvnlib}"/>
+			<clean-dir-if-exists dir="@{dir.deploy}"/>
+			<clean-dir-if-exists dir="@{dir.test.bin}"/>
+		</sequential>
+	</macrodef>
+	
+	<!-- setup ivy and download dependencies -->
+	<macrodef name="ivy-download-deps"
+		description="download ivy and then download dependencies defined in ivy.xml">
+		
+		<attribute name="ivyjardir" default="${dir.buildlib}"/>
+		<attribute name="ivyfile" default="${basedir}/ivy.xml" />
+		<attribute name="buildivyfile" default="${dir.buildresource}/ivy.xml" />
+		<attribute name="libsdir" default="${dir.library}" />
+		<attribute name="buildlibsdir" default="${dir.buildlib}"/>
+		<attribute name="namepattern" default="[organisation].[module].[artifact]-[revision](-[classifier]).[ext]"/>
+		<attribute name="ivyversion" default="2.2.0"/>
+				
+		<sequential>
+			<local name="have.buildlibsdir" />
+			<local name="have.ivy.jar" />			
+			<local name="have.skipivy" />
+			
+			<echo message="**********************************************************"/>
+			<echo message="*  SETUP IVY @{ivyversion} AND DOWNLOAD DEPENDENCIES (@{ivyfile}, @{buildivyfile})"/>
+			<echo message="**********************************************************"/>
+			
+			<property environment="env" />
+			
+			<condition property="have.skipivy">
+				<or>
+					<isset property="env.skipivy" />
+					<isset property="skipivy" />
+				</or>
+			</condition>
+			
+			<!-- still define ivy task to not fail other tasks -->
+			<sequential if:set="have.skipivy">
+				<echo message="user wants to skip ivy" />
+				<property name="ivy.jar.dir" value="@{ivyjardir}" />
+				<property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
+				
+				<!-- fail if no ivy jar file -->
+				<fail-not-exists 
+					arg="${ivy.jar.file}" 
+					type="file" 
+					message="missing ivy.jar"/>
+				
+				<!-- define ivy tasks -->
+		        <path id="ivy.lib.path">
+		            <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+		        </path>
+			    <taskdef resource="org/apache/ivy/ant/antlib.xml"
+						uri="antlib:org.apache.ivy.ant" 
+			     		classpathref="ivy.lib.path"/>				
+			</sequential>
+			
+			<!-- do not execute if SKIPIVY is set in environment -->
+			<sequential unless:set="have.skipivy">
+				<!-- set properties based on parameters -->
+				<condition property="have.buildlibsdir">
+					<and>
+						<not>
+							<equals arg1="@{buildlibsdir}" arg2="" trim="yes"/>
+						</not>
+						<not>
+							<equals arg1="@{buildivyfile}" arg2="" trim="yes"/>
+						</not>
+					</and>
+				</condition>
+				
+				<!-- set ivy properties -->
+				<condition property="ivy.home" value="${env.IVY_HOME}">
+					<isset property="env.IVY_HOME" />
+				</condition>
+				<property name="ivy.jar.dir" value="@{ivyjardir}" />
+				<property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
+				<condition property="ivy.writable">
+					<isfileselected file="${ivy.jar.dir}" >
+						<writable/>
+					</isfileselected>
+				</condition>
+				<condition property="have.ivy.jar">
+					<available file="${ivy.jar.file}" type="file"/>
+				</condition>
+				
+				
+				<!-- only try to download ivy if it does not exist already -->
+				<sequential unless:set="have.ivy.jar">
+					<!-- can reach maven repos -->
+					<condition property="am-offline">
+					  	<not><socket server="mvnrepository.com" port="443"/></not>
+					</condition>
+			
+					<echo if:set="am-offline" message="you are offline" />
+					
+			        <!-- download Ivy from web site so that it can be used even without any special installation -->
+					<mkdir dir="${ivy.jar.dir}"/>
+					<sequential unless:set="am-offline">
+						<echo message=" - downloading ivy" />
+						<get src="http://repo2.maven.org/maven2/org/apache/ivy/ivy/@{ivyversion}/ivy-@{ivyversion}.jar" 
+				             dest="${ivy.jar.file}" 
+				        		 usetimestamp="true"
+							 skipexisting="true"
+				        	    />
+					</sequential>
+				</sequential>
+				
+				<!-- fail if no ivy jar file -->
+				<fail-not-exists 
+					arg="${ivy.jar.file}" 
+					type="file" 
+					message="missing ivy.jar and was unable to download the jar"/>
+				
+				<!-- define ivy tasks -->
+		        <path id="ivy.lib.path">
+		            <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+		        </path>
+			    <taskdef resource="org/apache/ivy/ant/antlib.xml"
+						uri="antlib:org.apache.ivy.ant" 
+			     		classpathref="ivy.lib.path"/>
+				
+				<!-- download libraries -->
+				<sequential if:set="have.buildlibsdir">
+					<fail-not-exists arg="@{buildivyfile}" 
+							type="file" 
+							message="did not find ivy build file @{buildivyfile}"/>
+					<ivy:resolve file="@{buildivyfile}" />
+					<ivy:retrieve sync="false" type="jar" pattern="@{buildlibsdir}/[artifact]-[revision].[ext]" />
+				</sequential>
+				
+				<fail-not-exists arg="@{ivyfile}" 
+						type="file" 
+						message="did not find ivy  file @{ivyfile}"/>
+				<ivy:resolve file="@{ivyfile}"/> 
+				<ivy:retrieve sync="false" type="jar" pattern="@{libsdir}/@{namepattern}" />
+			</sequential>		
+	   </sequential>
+	</macrodef>
+	
+	<!-- create a class path from all jars in a dir -->
+	<macrodef name="classpath-from-dir"
+		description="create a classpath including all jars in a directory">
+		
+		<attribute name="dir" default="${dir.library}"/>
+		<attribute name="pathname" default="${classpath.name.bin}" />
+		<attribute name="pathnamejar" default="${classpath.name.bin}.jar"/>
+		<attribute name="jarcplibdir" default="lib" />
+		<element name="path-elements" optional="yes" />
+		
+		<sequential>
+			<echo message="**********************************************************"/>
+			<echo message="*  SETUP CLASS PATH @{pathname} for @{dir}"/>
+			<echo message="**********************************************************"/>
+			
+			<fail-not-exists arg="@{dir}"/>
+			
+			<path id="@{pathname}">
+				<fileset dir="@{dir}" includes="*.jar"/>
+				<path-elements />
+			</path>
+	
+			<pathconvert property="@{pathnamejar}" pathsep="    ">
+				<path>
+					<fileset dir="@{dir}">
+						<exclude name="ant*.jar" />
+					</fileset>
+				</path>
+				<mapper>
+					<chainedmapper>
+						<flattenmapper/>
+						<globmapper from="*.jar" to="@{jarcplibdir}/*.jar" casesensitive="no"/>
+					</chainedmapper>
+				</mapper>
+			</pathconvert>
+				
+			<echo message="Generated paths @{pathname} and ${@{pathnamejar}}"/>
+	   </sequential>
+	</macrodef>
+				
+	<!-- create javadoc -->
+	<macrodef name="create-javadoc">
+		<attribute name="srcdir" default="${dir.source}"/>
+		<attribute name="destdir" default="${dir.javadoc}"/>
+		<attribute name="classpathref" default="${classpath.name.bin}"/>
+		<attribute name="package" />
+		<attribute name="sourceversion" default="1.8"/>
+		
+		<sequential>
+			<echo message="**********************************************************"/>
+			<echo message="*  CREATE JAVADOC FOR @{srcdir} IN @{destdir}"/>
+			<echo message="**********************************************************"/>
+			
+			<fail-not-exists arg="${srcdir}" />
+			
+			<javadoc access="private" 
+				author="true" 
+				classpathref="@{classpathref}" 
+				destdir="@{destdir}" 
+				nodeprecated="false" 
+				nodeprecatedlist="false"
+				noindex="false" 
+				nonavbar="false" 
+				notree="false" 
+				packagenames="@{package}" 
+				source="@{sourceversion}" 
+				sourcepath="@{srcdir}" 
+				splitindex="true" 
+				use="true" 
+				version="true">
+			</javadoc>
+	   </sequential>
+	</macrodef>
+	
+	<!-- comile java sources with depends -->
+
+	<!-- create maven jars, pom file, and deploy to maven central via OSSRH -->
+	<macrodef name="deploy-to-maven-central"
+		description="Build jar artifacts, pom.xml, and deplay to maven central">
+		<attribute name="destdir" default="${dir.mvnlib}"/>
+		<attribute name="srcdir" default="${dir.source}"/>
+		<attribute name="ivyfile" default="${basedir}/ivy.xml"/>
+		<attribute name="pomtemplate" default="${dir.buildresource}/pom_template.xml" />
+		<attribute name="javadocdir" default="${dir.javadoc}"/>
+		<attribute name="bindir" default="${dir.bin}"/>
+		<attribute name="classpath" default="${classpath.name.build}"/>
+		<attribute name="release" default="no" />
+		<attribute name="artifactId" default=""/>
+		<attribute name="version" default=""/>
+		<attribute name="copyjar" default="${jar.bin}"/>
+		<attribute name="description" default="${mvn.description}" />
+		<attribute name="url" default="${mvn.url}" />
+		
+		<sequential>
+			<!-- properties local to macro -->
+			<local name="mvn.build.release.jar"/>
+			<local name="mvn.full.version"/>
+			<local name="mvn.jar.bin"/>
+			<local name="mvn.jar.javadoc"/>
+			<local name="mvn.jar.src"/>
+			<local name="ossrh-snapshots-repository-url" />
+			<local name="ossrh-staging-repository-url" />
+			<local name="ossrh-server-id" />		
+			<local name="pomfile" />
+			
+			<property name="mvn.settings.file" value="${user.home}/.m2/settings.xml" />
+			
+			<property name="pomfile" value="@{destdir}/pom.xml"/>
+			
+			<!-- check whether release should be build -->
+			<condition property="mvn.build.release.jar">
+				<equals arg1="@{release}" arg2="yes" trim="yes"/>
+			</condition>
+			
+			<!-- create pom.xml -->
+			<echo message="**********************************************************"/>
+			<echo message="*  CREATE POM @{pomfile}"/>
+			<echo message="**********************************************************"/>
+
+			<ivy:info file="@{ivyfile}" />
+			
+			<!-- determine group, artifact, version -->
+			<condition property="mvn.version" value="${ivy.revision}">
+				<equals arg1="@{version}" arg2="" trim="yes"/>
+			</condition>
+			<condition property="mvn.version" value="@{version}">
+				<not><equals arg1="@{version}" arg2="" trim="yes"/></not>
+			</condition>
+			<condition property="mvn.artifactId" value="${ivy.module}">
+				<equals arg1="@{artifactId}" arg2="" trim="yes"/>
+			</condition>
+			<condition property="mvn.artifactId" value="@{artifactId}">
+				<not><equals arg1="@{artifactId}" arg2="" trim="yes"/></not>
+			</condition>
+			
+			<sequential if:set="mvn.build.release.jar">
+				<!--
+				<property name="mvn.full.version" value="${mvn.version}-RELEASE"/>
+				<property name="mvn.is.release" value="-RELEASE"/>
+				-->
+				<property name="mvn.full.version" value="${mvn.version}"/>
+				<property name="mvn.is.release" value=""/>
+			</sequential>
+			<sequential unless:set="mvn.build.release.jar">
+				<property name="mvn.full.version" value="${mvn.version}-SNAPSHOT"/>
+				<property name="mvn.is.release" value="-SNAPSHOT"/>
+			</sequential>
+						
+			<!-- make pom from ivy file -->
+			<local name="ivy.pom.name" />
+			<local name="ivy.pom.description" />
+			<local name="ivy.pom.url" />
+			<property name="ivy.pom.name" value="${mvn.artifactId}" />
+			<property name="ivy.pom.description" value="@{description}" />
+			<property name="ivy.pom.url" value="@{url}" />
+			
+			<echo message="build ${mvn.artifactId} ${mvn.version} (${mvn.full.version}) - ${ivy.pom.name}
+				${ivy.pom.description}
+				${ivy.pom.url}
+				" />
+			
+			<ivy:makepom ivyfile="@{ivyfile}" pomfile="${pomfile}" templatefile="@{pomtemplate}" conf="default,runtime">
+			   <mapping conf="default" scope="compile"/>
+			   <mapping conf="runtime" scope="runtime"/>
+			</ivy:makepom>
+			
+			<!-- create jar files -->
+			<echo message="**********************************************************"/>
+			<echo message="*  CREATE MAVEN JARS"/>
+			<echo message="**********************************************************"/>
+			
+			<!-- define artifacts' name, which follows the convention of Maven -->
+			<property name="mvn.jar.bin" value="@{destdir}/${mvn.artifactId}-${mvn.full.version}.jar" />
+			<property name="mvn.jar.javadoc" value="@{destdir}/${mvn.artifactId}-${mvn.full.version}-javadoc.jar" />
+			<property name="mvn.jar.src" value="@{destdir}/${mvn.artifactId}-${mvn.full.version}-sources.jar" />
+	
+			
+			<copy file="@{copyjar}" tofile="${mvn.jar.bin}" />
+			
+			<!-- build the javadoc jar -->
+			<jar jarfile="${mvn.jar.javadoc}">
+				<fileset dir="@{javadocdir}" />
+			</jar>
+	
+			<!-- build the sources jar -->
+			<jar jarfile="${mvn.jar.src}">
+				<fileset dir="@{srcdir}" />
+			</jar>
+			
+			<echo message="**********************************************************"/>
+			<echo message="*  DEPLOY TO OSSRH"/>
+			<echo message="**********************************************************"/>
+			<!-- define maven task -->
+			<typedef resource="org/apache/maven/artifact/ant/antlib.xml" 
+				uri="antlib:org.apache.maven.artifact.ant" 
+				classpathref="@{classpath}"
+				unless:set="mvn.ant.initialized">
+			</typedef>
+			<property name="mvn.ant.initialized" value="true"/>
+			
+			<!-- defined maven snapshots and staging repository id and url -->
+			<property name="ossrh-snapshots-repository-url" 
+			    value="https://oss.sonatype.org/content/repositories/snapshots/" />
+			<property name="ossrh-staging-repository-url" 
+			    value="https://oss.sonatype.org/service/local/staging/deploy/maven2/" />
+			<!-- there server id in the Maven settings.xml -->
+			<property name="ossrh-server-id" value="ossrh" />
+
+			
+			<!-- deploy (either as SNAPSHOT or RELEASE) -->
+			<sequential if:set="mvn.build.release.jar">
+				<echo message=" - DEPLOY AS RELEASE"/>
+			    <!-- sign and deploy the main artifact -->
+			    <artifact:mvn classpathref="@{classpath}">
+			    	  <arg value="--settings" />
+		    		  <arg value="${mvn.settings.file}" />
+			      <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
+			      <arg value="-Durl=${ossrh-staging-repository-url}" />
+			      <arg value="-DrepositoryId=${ossrh-server-id}" />
+			      <arg value="-DpomFile=${pomfile}" />
+			      <arg value="-Dfile=${mvn.jar.bin}" />
+			      <arg value="-Pgpg" />
+			    </artifact:mvn>
+
+			    <!-- sign and deploy the sources artifact -->
+			    <artifact:mvn classpathref="@{classpath}">
+			    	  <arg value="--settings" />
+		    		  <arg value="${mvn.settings.file}" />
+			    	  <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
+			      <arg value="-Durl=${ossrh-staging-repository-url}" />
+			      <arg value="-DrepositoryId=${ossrh-server-id}" />
+			      <arg value="-DpomFile=${pomfile}" />
+			      <arg value="-Dfile=${mvn.jar.src}" />
+			      <arg value="-Dclassifier=sources" />
+			      <arg value="-Pgpg" />
+			    </artifact:mvn>
+
+			    <!-- sign and deploy the javadoc artifact -->
+			    <artifact:mvn classpathref="@{classpath}">
+			    	  <arg value="--settings" />
+		    		  <arg value="${mvn.settings.file}" />
+			      <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
+			      <arg value="-Durl=${ossrh-staging-repository-url}" />
+			      <arg value="-DrepositoryId=${ossrh-server-id}" />
+			      <arg value="-DpomFile=${pomfile}" />
+			      <arg value="-Dfile=${mvn.jar.javadoc}" />
+			      <arg value="-Dclassifier=javadoc" />
+			      <arg value="-Pgpg" />
+			    </artifact:mvn>
+			</sequential>
+			<!-- deploy snapshot -->
+			<sequential unless:set="mvn.build.release.jar">
+				<echo message=" - DEPLOY AS SNAPSHOT"/>
+				<artifact:mvn classpathref="@{classpath}">
+			    	  	<arg value="--settings" />
+		    		  	<arg value="${mvn.settings.file}" />
+		      		<arg value="org.apache.maven.plugins:maven-deploy-plugin:2.6:deploy-file" />
+		      		<arg value="-Durl=${ossrh-snapshots-repository-url}" />
+		      		<arg value="-DrepositoryId=${ossrh-server-id}" />
+		      		<arg value="-DpomFile=${pomfile}" />
+		      		<arg value="-Dfile=${mvn.jar.bin}" />
+		    		</artifact:mvn>
+			</sequential>
+	   </sequential>
+	</macrodef>
+	
+	
+	<!-- create pom file -->
+	<macrodef name="create-mvn-pom"
+		description="Build pom.xml">
+		<attribute name="destdir" default="${dir.mvnlib}"/>
+		<attribute name="ivyfile" default="${basedir}/ivy.xml"/>
+		<attribute name="pomtemplate" default="${dir.buildresource}/pom_template.xml" />
+		<attribute name="release" default="no" />
+		<attribute name="artifactId" default=""/>
+		<attribute name="version" default=""/>
+		<attribute name="description" default="${mvn.description}" />
+		<attribute name="url" default="${mvn.url}" />
+		
+		<sequential>
+			<!-- properties local to macro -->
+			<local name="mvn.build.release.jar"/>
+			<local name="mvn.full.version"/>
+			<local name="pomfile" />
+			
+			<property name="pomfile" value="@{destdir}/pom.xml"/>
+			
+			<!-- check whether release should be build -->
+			<condition property="mvn.build.release.jar">
+				<equals arg1="@{release}" arg2="yes" trim="yes"/>
+			</condition>
+			
+			<!-- create pom.xml -->
+			<echo message="**********************************************************"/>
+			<echo message="*  CREATE POM @{pomfile}"/>
+			<echo message="**********************************************************"/>
+
+			<ivy:info file="@{ivyfile}" />
+			
+			<!-- determine group, artifact, version -->
+			<condition property="mvn.version" value="${ivy.revision}">
+				<equals arg1="@{version}" arg2="" trim="yes"/>
+			</condition>
+			<condition property="mvn.version" value="@{version}">
+				<not><equals arg1="@{version}" arg2="" trim="yes"/></not>
+			</condition>
+			<condition property="mvn.artifactId" value="${ivy.module}">
+				<equals arg1="@{artifactId}" arg2="" trim="yes"/>
+			</condition>
+			<condition property="mvn.artifactId" value="@{artifactId}">
+				<not><equals arg1="@{artifactId}" arg2="" trim="yes"/></not>
+			</condition>
+			
+			<sequential if:set="mvn.build.release.jar">
+				<property name="mvn.full.version" value="${mvn.version}-RELEASE"/>
+				<property name="mvn.is.release" value="-RELEASE"/>
+			</sequential>
+			<sequential unless:set="mvn.build.release.jar">
+				<property name="mvn.full.version" value="${mvn.version}-SNAPSHOT"/>
+				<property name="mvn.is.release" value="-SNAPSHOT"/>
+			</sequential>
+						
+			<!-- make pom from ivy file -->
+			<local name="ivy.pom.name" />
+			<local name="ivy.pom.description" />
+			<local name="ivy.pom.url" />
+			<property name="ivy.pom.name" value="${mvn.artifactId}" />
+			<property name="ivy.pom.description" value="@{description}" />
+			<property name="ivy.pom.url" value="@{url}" />
+			
+			<echo message="build POM for ${mvn.artifactId} ${mvn.version} (${mvn.full.version}) - ${ivy.pom.name}
+				${ivy.pom.description}
+				${ivy.pom.url}
+				" />
+			
+			<ivy:makepom ivyfile="@{ivyfile}" pomfile="${pomfile}" templatefile="@{pomtemplate}" conf="default,runtime">
+			   <mapping conf="default" scope="compile"/>
+			   <mapping conf="runtime" scope="runtime"/>
+			</ivy:makepom>
+	   </sequential>
+	</macrodef>
+	
+	<!-- create basic build dirs -->
+	<macrodef name="create-jar"
+		description="create a jar file">
+		
+		<attribute name="jar" default="${jar.bin}" />
+		<attribute name="classpath" default="${classpath.bin.jar}" />
+		<attribute name="bindir" default="${dir.bin}" />
+		<attribute name="jarcreator" default="${jar.creator}" />
+		<attribute name="adddirs" default="" />
+		<attribute name="mainclass" default="${mainclass}" />
+		<element name="additional-resources" optional="true" />
+		
+		<sequential>
+			<echo message="**********************************************************"/>
+			<echo message="*  CREATE JAR @{jar} from @{bindir} including @{adddirs} "/>
+			<echo message="**********************************************************"/>
+
+			<local name="have.include.resources" />
+			
+			<fail-if-empty arg="@{jarcreator}" />
+			<fail-if-empty arg="@{mainclass}" />
+			<fail-not-exists arg="@{bindir}" />
+			
+			<set-prop-if-not-empty arg="@{addirs}" propname="have.include.resources"/>
+			
+			<sequential unless:set="have.include.resources">
+				<jar destfile="@{jar}">
+					<manifest>
+						<attribute name="Main-Class" value="@{mainclass}" />
+						<attribute name="Created-By" value="@{jarcreator}" />
+						<attribute name="Class-Path" value="@{classpath}" />
+					</manifest>
+					<fileset dir="@{bindir}" />
+					<additional-resources />
+				</jar>
+			</sequential>
+			<sequential if:set="have.include.resources">
+				<jar destfile="@{jar}">
+					<manifest>
+						<attribute name="Main-Class" value="@{mainclass}" />
+						<attribute name="Created-By" value="@{jarcreator}" />
+						<attribute name="Class-Path" value="@{classpath}" />
+					</manifest>
+					<multirootfileset basedirs="@{adddirs}" />
+					<fileset dir="@{bindir}" />
+					<additional-resources />
+				</jar>
+			</sequential>
+		</sequential>
+	</macrodef>
+
+	<!-- create a fat jar with onejar -->
+	<macrodef name="create-onejar"
+		description="create a fat jar file using one-jar">
+		
+		<attribute name="jar" default="${jar.bin.fat}" />
+		<attribute name="classpath" default="${classpath.bin.jar}" />
+		<attribute name="bindir" default="${dir.bin}" />
+		<attribute name="jarcreator" default="${jar.creator}" />
+		<attribute name="resourcefileset" default="" />
+		<attribute name="mainclass" default="${mainclass}" />
+		<attribute name="libdir" default="${dir.library}" />
+		<attribute name="binlib" default="" />
+		<attribute name="basedir" default="${basedir}" />
+		<attribute name="onejarcp" default="${classpath.name.build}" />
+		
+		<sequential>
+			<echo message="**********************************************************"/>
+			<echo message="*  CREATE ONEJAR @{jar} from @{bindir} including @{libdir} with native libraries @{binlib} "/>
+			<echo message="*  also include @{resourcefileset} in @{basedir}" />
+			<echo message="**********************************************************"/>
+
+			<local name="have.include.resources" />
+			<local name="have.bin.lib" />			
+			<local name="include-and-bin" />
+			<local name="include-and-not-bin" />
+			<local name="not-include-and-bin" />
+			<local name="not-include-and-not-bin" />
+			
+			<fail-if-empty arg="@{jar}" />
+			<fail-if-empty arg="@{jarcreator}" />
+			<fail-if-empty arg="@{mainclass}" />
+			<fail-not-exists arg="@{bindir}" />
+			
+			<set-prop-if-not-empty arg="@{resourcefileset}" propname="have.include.resources"/>
+			<set-prop-if-not-empty arg="@{binlib}" propname="have.bin.lib"/>
+		
+			<echo message="include extra resources from fileset: ${have.include.resources} native libraries: ${have.bin.lib}" />
+			
+			<sequential if:set="have.include.resources">
+				<print-fileset filesetid="@{resourcefileset}"/>
+			</sequential>
+			
+			<condition property="include-and-bin">
+				<and>
+					<isset property="have.include.resources" />
+					<isset property="have.bin.lib" />
+				</and>
+			</condition>		
+			
+			<condition property="include-and-not-bin">
+				<and>
+					<isset property="have.include.resources" />
+					<not><isset property="have.bin.lib" /></not>
+				</and>
+			</condition>
+			
+			<condition property="not-include-and-bin">
+				<and>
+					<not><isset property="have.include.resources" /></not>
+					<isset property="have.bin.lib" />
+				</and>
+			</condition>
+			
+			<condition property="not-include-and-not-bin">
+				<and>
+					<not><isset property="have.include.resources" /></not>
+					<not><isset property="have.bin.lib" /></not>
+				</and>
+			</condition>
+			
+			<!-- define onejar anttask -->
+		    <define-task 
+		    		name="one-jar" 
+			    	classname="com.simontuffs.onejar.ant.OneJarTask" 
+			    	classpathref="@{onejarcp}" />  
+
+			<!-- do work -->
+			<delete file="@{jar}"/>
+			
+			<!-- no additional includes -->
+			<sequential if:set="not-include-and-not-bin">
+				<echo message="no resources and no native libs" />
+				<one-jar destfile="@{jar}">
+		            <manifest>
+						<attribute name="Created-By" value="@{jarcreator}" />
+		            	<!-- <attribute name="One-Jar-Expand" value=""/>
+		                <attribute name="One-Jar-Expand-Dir" value="./.expand"/>
+		                <attribute name="One-Jar-Show-Expand" value="true"/> -->
+		    	        		<attribute name="One-Jar-Main-Class" value="@{mainclass}" />
+		            		<attribute name="Class-Path" value="@{classpath}" />
+		            </manifest>
+		            <main>
+		                <fileset dir="@{bindir}/"/>
+		            </main>
+		            <lib>
+		                <fileset file="@{libdir}/*.jar" />
+		            </lib>
+				</one-jar> 
+			</sequential>
+			<!-- include both additional dirs and not bin -->
+			<sequential if:set="include-and-not-bin">
+				<echo message="resources and no native libs" />
+				<one-jar destfile="@{jar}">
+		            <manifest>
+						<attribute name="Created-By" value="@{jarcreator}" />
+		    	        		<attribute name="One-Jar-Main-Class" value="@{mainclass}" />
+		            		<attribute name="Class-Path" value="@{classpath}" />
+		            </manifest>
+		            <main>
+		            		<fileset refid="@{resourcefileset}" />
+		                <fileset dir="@{bindir}/"/>
+		            </main>
+		            <lib>
+		                <fileset file="@{libdir}/*.jar" />
+		            </lib>
+				</one-jar> 
+			</sequential>
+			<!-- include native libraries -->
+			<sequential if:set="not-include-and-bin">
+				<echo message="no resources and native libs" />
+				<one-jar destfile="@{jar}">
+		            <manifest>
+						<attribute name="Created-By" value="@{jarcreator}" />
+		    	        		<attribute name="One-Jar-Main-Class" value="@{mainclass}" />
+		            		<attribute name="Class-Path" value="@{classpath}" />
+		            </manifest>
+		            <main>
+		                <fileset dir="@{bindir}/"/>
+		            </main>
+		            <lib>
+		                <fileset file="@{libdir}/*.jar" />
+		            </lib>
+		        		<binlib>
+		        			<fileset file="@{binlib}" />
+		        		</binlib>
+				</one-jar> 
+			</sequential>
+			<!-- include both additional dirs and naitve libraries -->
+			<sequential if:set="include-and-bin">
+				<echo message="resources and native libs" />
+				<one-jar destfile="@{jar}">
+		            <manifest>
+						<attribute name="Created-By" value="@{jarcreator}" />
+		    	        		<attribute name="One-Jar-Main-Class" value="@{mainclass}" />
+		            		<attribute name="Class-Path" value="@{classpath}" />
+		            </manifest>
+		            <main>
+		            		<fileset refid="@{resourcefileset}" />
+		                <fileset dir="@{bindir}/"/>
+		            </main>
+		            <lib>
+		                <fileset file="@{libdir}/*.jar" />
+		            </lib>
+		        		<binlib>
+		        			<fileset file="@{binlib}" />
+		        		</binlib>
+				</one-jar> 
+			</sequential>
+		</sequential>
+	</macrodef>	
+
+	
+	<!-- detect OS -->
+	<macrodef name="detect-os"
+		description="create a jar file">
+				
+		<attribute name="typeprop" default="os.type" />
+		
+		<sequential>
+			<fail-if-empty arg="@{typeprop}" />
+			
+			<local name="local.os" />
+			<condition property="local.os" value="windows">
+				<os family="windows" />
+			</condition>
+			<condition property="local.os" value="mac">
+				<os family="mac" />
+			</condition>
+			<condition property="local.os" value="unix">
+				<os family="unix" />
+			</condition>
+			
+			<echo message="**********************************************************"/>
+			<echo message="*  OS IS ${local.os} "/>
+			<echo message="**********************************************************"/>
+			
+			<property name="@{typeprop}" value="${local.os}"/>	    
+		</sequential>
+	</macrodef>
+	
+	
+	<!-- ******************************************************************************** -->
+	<!-- * DEFAULT TARGETS (OVERRIDE IN MAIN IF NEED BE)									-->
+	<!-- ******************************************************************************** -->
+
+	<!-- create build directories and setup basic properties -->
+	<target name="mkdirs-and-setup-props">
+		<check-ant-version />
+		<set-default-props />
+		
+		<property name="jar.bin" value="${dir.build}/${artifactId}.jar" />
+		
+		<create-build-dirs />
+	</target>
+
+	<!-- remove all files from library dir -->
+	<target name="delete-libraries"
+			depends="mkdirs-and-setup-props"
+			description="deletes all files in library dir">
+		
+		<clean-dir-if-exists dir="${dir.library}"/>
+	</target>
+	
+	<!-- clean up all build artifacts --> 
+	<target name="clean-all"
+			description="cleanup all build artifacts"
+			depends="mkdirs-and-setup-props">
+		
+		<clean-build-dirs />
+	</target>
+	
+	<!-- download dependencies with ivy -->
+	<target name="download-dependencies" 
+			depends="mkdirs-and-setup-props" 
+			description="use ivy to download dependencies">
+		
+		<fail message="not all parameters setup for downloading dependencies">
+			<condition>
+				<or>
+					<not><isset property="dir.buildlib" /></not>
+					<not><isset property="dir.library" /></not>
+					<not><isset property="classpath.name.bin" /></not>
+					<not><isset property="classpath.name.build" /></not>
+				</or>
+		 	</condition>
+		</fail>
+		
+		<ivy-download-deps/>
+		<classpath-from-dir dir="${dir.buildlib}" 
+				pathname="${classpath.name.build}" 
+				pathnamejar="${classpath.name.build}.jar"/>
+		<classpath-from-dir dir="${dir.library}" 
+				pathname="${classpath.name.bin}" 
+				pathnamejar="${classpath.name.bin}.jar"/>
+	</target>
+	
+	<!-- Internal Taskdefs -->
+	<target name="define-tasks-and-setup-paths" 
+			depends="download-dependencies">
+	</target>
+	
+	<!-- Compilation -->	
+	<target name="compile" 
+			depends="define-tasks-and-setup-paths"
+			description="compile Java sources">
+		
+		<fail message="not all parameters setup for compiling Java sources">
+			<condition>
+				<or>
+					<not><isset property="dir.bin" /></not>
+					<not><isset property="dir.source" /></not>
+					<not><isset property="classpath.name.bin" /></not>
+				</or>
+			</condition>
+		</fail>
+		
+		<echo message="**********************************************************"/>
+		<echo message="*  COMPILE ${dir.source} TO ${dir.bin} using ${classpath.name.bin} "/>
+		<echo message="**********************************************************"/>
+		
+		<javac srcdir="${dir.source}" destdir="${dir.bin}" 
+			classpathref="${classpath.name.bin}" debug="on" includeantruntime="false">
+			<compilerarg value="-Xlint:unchecked" />
+		</javac>
+	</target>
+	
+	<!-- generate java doc -->
+	<target name="java-doc" 
+		depends="define-tasks-and-setup-paths"
+		description="generate Javadocs">
+		
+		<fail message="not all parameters setup for building javadoc">
+			<condition>
+				<or>
+					<not><isset property="package" /></not>
+				</or>
+			</condition>
+		</fail>
+		
+		<create-javadoc package="${package}"/>
+	</target>
+	
+	<!-- create a jar file -->
+	<target name="jar" 
+		depends="compile"
+		description="generate jar file">
+		
+		<fail message="not all parameters setup for building a jar">
+			<condition>
+				<or>
+					<not><isset property="jar.bin" /></not>
+					<not><isset property="dir.bin" /></not>
+					<not><isset property="mainclass" /></not>
+					<not><isset property="classpath.bin.jar" /></not>
+					<not><isset property="jar.creator" /></not>
+				</or>
+			</condition>
+		</fail>
+		
+		<create-jar/>
+	</target>
+	
+	<!-- deploy to mvn central -->
+	<target name="create-pom" depends="define-tasks-and-setup-paths">
+		<create-mvn-pom/>
+	</target>
+	
+	<target name="deploy-snapshot" 
+			depends="jar,java-doc"
+			description="generate jars and pom.xml and deploy them as a snapshot to OSSRH">
+		<deploy-to-maven-central release="no"/>
+	</target>
+	
+	<target name="deploy-mvn-central" 
+			depends="jar,java-doc"
+			description="generate jars and pom.xml and deploy them to maven central via OSSRH">
+		<deploy-to-maven-central release="yes"/>
+	</target>
+	
+</project>
