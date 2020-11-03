@@ -3,7 +3,7 @@
  * analyze_dl.c
  *			  
  *		
- *		AUTHOR: lord_pretzel
+ *		AUTHOR: lord_pretzel & seokki
  *
  *		
  *

@@ -3,7 +3,7 @@
  * sql_serializer_postgres.c
  *			  
  *		
- *		AUTHOR: lord_pretzel
+ *		AUTHOR: lord_pretzel & seokki
  *
  *		
  *
@@ -165,9 +165,12 @@ quoteIdentifierPostgres (char *ident)
     boolean needsQuotes = FALSE;
     boolean containsQuotes = FALSE;
 
-    // already quoted
-    if (ident[0] == '"')
-        return ident;
+//    // already quoted
+//    if (ident[0] == '"')
+//        return ident;
+
+    if (ident[0] != '"')
+    	needsQuotes = TRUE;
 
     // sqlite completely ignores case no matter whether the identifier is quoted or not
     // so upper/lower case does not indicate whether we need to escape
@@ -185,7 +188,7 @@ quoteIdentifierPostgres (char *ident)
                 needsQuotes = TRUE;
                 break;
             case '"':
-                needsQuotes = TRUE;
+//                needsQuotes = TRUE;
                 containsQuotes = TRUE;
                 break;
             default:

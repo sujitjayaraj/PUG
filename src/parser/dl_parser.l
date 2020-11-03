@@ -165,8 +165,9 @@ THRESHOLDS			"THRESHOLDS"
 (?i:SUM)	TOK(AMMSC)
 (?i:COUNT)	TOK(AMMSC)
 
+
 	/* identifier types */
-{identifier}	UPCASE_TOK(IDENT)
+{identifier}	TOK(IDENT)
 	/* {variable}	 	UPCASE_TOK(VARIDENT)*/
 
 {quotedIdentifier}   { 		
