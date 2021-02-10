@@ -1,5 +1,5 @@
 ########################################
-# SOURCE USER CONFIGURATION (PUG_src/.pug) and (~/.pug}
+# SOURCE USER CONFIGURATION (pug_src/.pug) and (~/.pug}
 if [ -f ${HOME}/${CONF_FILE} ]; then
 	source ${HOME}/${CONF_FILE}
 fi

@@ -40,8 +40,7 @@ build
 autotests
 valgrind.txt
 src/command_line/gprom
-.pug
-.pug-postgres
+.pug*
 scripts/.gitignore
 /Debug/
 test/test-suite.log

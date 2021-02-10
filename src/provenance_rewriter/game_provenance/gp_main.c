@@ -3,7 +3,7 @@
  * gp_main.c
  *			  
  *		
- *		AUTHOR: lord_pretzel
+ *		AUTHOR: lord_pretzel & seokki
  *
  *		
  *

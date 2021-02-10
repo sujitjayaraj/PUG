@@ -146,7 +146,10 @@ typedef (void *) gprom_long_t;
 /* streq function */
 #if HAVE_STRCMP
 #define streq(_l,_r) (strcmp(_l,_r) == 0)
-#define strpeq(_l,_r) (((_l) == (_r)) || ((_l != NULL) && (_r != NULL) && (strcmp(_l,_r) == 0)))
+// TODO: correctly define strpeq
+//#define strpeq(_l,_r) (((_l) == (_r)) || ((_l != NULL) && (_r != NULL) && (strcmp(_l,_r) == 0))) // unspecified comparion error
+//#define strpeq(_l,_r) ((streq(_l,_r)) || ((_l != NULL) && (_r != NULL) && (strcmp(_l,_r) == 0))) // segmentation fault error
+#define strpeq(_l,_r) (((_l != NULL) && (_r != NULL) && (strcmp(_l,_r) == 0)))
 #define strneq(_l,_r,n) (strncmp(_l,_r,n) == 0)
 #define strStartsWith(_str,_prefix) (strncmp(_str,_prefix,strlen(_prefix)) == 0)
 #endif

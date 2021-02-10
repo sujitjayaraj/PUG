@@ -47,7 +47,7 @@
         "end; $$ language plpgsql;"
 
 // we have to use syntax that works a reasonable range of postgres versions
-#define QUERY_GET_SERVER_VERSION " SELECT version[1] AS major, version[2] AS minor FROM " \
+#define QUERY_GET_SERVER_VERSION "SELECT version[1] AS major, version[2] AS minor FROM " \
 	    "(SELECT regexp_split_to_array(substring(version() from 'PostgreSQL ([0-9]+[.][0-9]+)'), '[.]') AS version) getv;"
 //#define QUERY_GET_SERVER_VERSION "SELECT version[1] AS major, version[2] AS minor FROM " \
 //        "(SELECT (regexp_match(version(), '(\\d+).(\\d+)'))::text[] AS version) getv;"
@@ -153,8 +153,8 @@
 //#define NAME_ "GPRoM_"
 //#define PARAMS_ 1
 //#define QUERY_ "SELECT"
-#define QUERY_GET_DT_OIDS "SELECT oid, typname FROM pg_type" //  WHERE typtype = 'b';"
-#define QUERY_GET_ANY_OIDS "SELECT oid FROM pg_type WHERE typname = 'any' OR typname = 'anyelement'"
+#define QUERY_GET_DT_OIDS "SELECT oid, typname FROM pg_type;" //  WHERE typtype = 'b';"
+#define QUERY_GET_ANY_OIDS "SELECT oid FROM pg_type WHERE typname = 'any' OR typname = 'anyelement';"
 
 // prepare a catalog lookup query
 #define PREP_QUERY(name) prepareQuery(NAME_ ## name, QUERY_ ## name, PARAMS_ ## name, NULL)
@@ -1067,9 +1067,9 @@ execStmt (char *stmt)
     PGconn *c = plugin->conn;;
 
     res = PQexec(c, "BEGIN TRANSACTION;");
-        if (PQresultStatus(res) != PGRES_COMMAND_OK)
-            CLOSE_RES_CONN_AND_FATAL(res, "BEGIN TRANSACTION for statement failed: %s",
-                    PQerrorMessage(c));
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+		CLOSE_RES_CONN_AND_FATAL(res, "BEGIN TRANSACTION for statement failed: %s",
+				PQerrorMessage(c));
     PQclear(res);
 
     DEBUG_LOG("execute statement %s", stmt);
@@ -1090,16 +1090,14 @@ execQuery(char *query)
     PGconn *c = plugin->conn;
 
     res = PQexec(c, "BEGIN TRANSACTION;");
-        if (PQresultStatus(res) != PGRES_COMMAND_OK)
-            CLOSE_RES_CONN_AND_FATAL(res, "BEGIN TRANSACTION for DECLARE CURSOR failed: %s",
-                    PQerrorMessage(c));
+	if (PQresultStatus(res) != PGRES_COMMAND_OK)
+		CLOSE_RES_CONN_AND_FATAL(res, "BEGIN TRANSACTION for DECLARE CURSOR failed: %s", PQerrorMessage(c));
     PQclear(res);
 
     DEBUG_LOG("create cursor for %s", query);
     res = PQexec(c, CONCAT_STRINGS("DECLARE myportal CURSOR FOR ", query));
     if (PQresultStatus(res) != PGRES_COMMAND_OK)
-        CLOSE_RES_CONN_AND_FATAL(res, "DECLARE CURSOR failed: %s",
-                PQerrorMessage(c));
+        CLOSE_RES_CONN_AND_FATAL(res, "DECLARE CURSOR failed: %s", PQerrorMessage(c));
     PQclear(res);
 
     res = PQexec(c, "FETCH ALL in myportal");
