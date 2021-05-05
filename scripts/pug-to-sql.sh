@@ -33,6 +33,5 @@ else
 	ORACLE=${POSTGRES}
 fi
 
-#echo "connection info: ${CONNECTION_PARAMS}"
 ${PUG} ${LOG} -sql "${PROGRAM}" ${CONNECTION_PARAMS} ${ORACLE} ${PUG_DL_PLUGINS} -Pexecutor sql -Cattr_reference_consistency FALSE -Cschema_consistency FALSE  -Cunique_attr_names FALSE -treeify-algebra-graphs FALSE ${*:3}
 

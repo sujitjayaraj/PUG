@@ -28,8 +28,10 @@ GDB=gdb
 
 if [[ $OSTYPE == darwin* ]]; then
 	DEBUGGER=${LLDB}
+	DEBUGOPT="--"
 else
 	DEBUGGER=${GDB}
+	DEBUGOPT="--args"
 fi
 ###########################################
 POSTGRES=""
@@ -42,4 +44,4 @@ else
 fi
 
 
-${DEBUGGER} -- ${PUG} ${LOG} -sql "${PROGRAM}" ${CONNECTION_PARAMS} ${ORACLE} ${PUG_DL_PLUGINS} -Pexecutor sql -whynot_adv -attr_dom -treeify-algebra-graphs FALSE ${*:3}
+${DEBUGGER} ${DEBUGOPT} ${PUG} ${LOG} -sql "${PROGRAM}" ${CONNECTION_PARAMS} ${ORACLE} ${PUG_DL_PLUGINS} -Pexecutor sql -whynot_adv -attr_dom -treeify-algebra-graphs FALSE ${*:3}
