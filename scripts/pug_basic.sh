@@ -43,7 +43,7 @@ else
 fi
 ########################################
 # COMBINED CONFIGURATIONS USED BY SCRIPTS
-PUG_DL_PLUGINS="-frontend dl -whynot_adv -attr_dom"
+PUG_DL_PLUGINS="-frontend dl -whynot_adv"
 ########################################
 # FUNCTION THAT CHECKS WHETHER PROGRAM EXISTS
 checkProgram() {
