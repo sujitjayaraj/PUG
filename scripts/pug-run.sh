@@ -34,5 +34,5 @@ else
 fi
 
 #echo "connection info: ${CONNECTION_PARAMS}"
-${PUG} ${LOG} -sql "${PROGRAM}" ${CONNECTION_PARAMS} ${ORACLE} ${PUG_DL_PLUGINS} -Pexecutor run -Cattr_reference_consistency FALSE -Cschema_consistency FALSE  -Cunique_attr_names FALSE -treeify-algebra-graphs FALSE ${*:3}
+${PUG} ${LOG} -sql "${PROGRAM}" ${CONNECTION_PARAMS} ${ORACLE} ${PUG_DL_PLUGINS} -Pexecutor run -attr_dom -Cattr_reference_consistency FALSE -Cschema_consistency FALSE  -Cunique_attr_names FALSE -treeify-algebra-graphs FALSE ${*:3}
 

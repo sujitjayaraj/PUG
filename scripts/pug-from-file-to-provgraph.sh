@@ -50,7 +50,7 @@ else
 	ORACLE=${POSTGRES}
 fi
 
-${PUG} ${CONNECTION_PARAMS} ${ORACLE} ${PUG_DL_PLUGINS} -Pexecutor gp -Cattr_reference_consistency FALSE -Cschema_consistency FALSE  -Cunique_attr_names FALSE -sqlfile ${DLFILE} ${*:3} > ${DOTFILE}
+${PUG} ${CONNECTION_PARAMS} ${ORACLE} ${PUG_DL_PLUGINS} -Pexecutor gp -attr_dom -Cattr_reference_consistency FALSE -Cschema_consistency FALSE  -Cunique_attr_names FALSE -sqlfile ${DLFILE} ${*:3} > ${DOTFILE}
 
 ##########
 echo "-- run graphviz on ${DOTFILE} to produce PDF file ${PDFFILE}"

@@ -42,4 +42,4 @@ else
 fi
 
 
-${PUG} ${LOG} ${CONNECTION_PARAMS} ${ORACLE} ${PUG_DL_PLUGINS} -Pexecutor sql -Cattr_reference_consistency FALSE -Cschema_consistency FALSE  -Cunique_attr_names FALSE -treeify-algebra-graphs FALSE -sqlfile ${DLFILE} ${*:3}
+${PUG} ${LOG} ${CONNECTION_PARAMS} ${ORACLE} ${PUG_DL_PLUGINS} -Pexecutor sql -attr_dom -Cattr_reference_consistency FALSE -Cschema_consistency FALSE  -Cunique_attr_names FALSE -treeify-algebra-graphs FALSE -sqlfile ${DLFILE} ${*:3}
