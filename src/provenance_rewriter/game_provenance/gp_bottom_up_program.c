@@ -2412,18 +2412,18 @@ static List*createGPReducedMoveRules(int getMatched, List* negedbRules, List* ed
 			{
 //				if (!searchListNode(ruleArgs, n))
 //				{
-					if(isA(n, Constant))
-						ruleArgs = appendToTailOfList(ruleArgs, n);
-					else
+				if(isA(n, Constant))
+					ruleArgs = appendToTailOfList(ruleArgs, n);
+				else
+				{
+					if(isA(n, DLVar))
 					{
-						if(isA(n, DLVar))
-						{
-	                        DLVar *v = (DLVar *) n;
+						DLVar *v = (DLVar *) n;
 
-                            if(v->dt != DT_BOOL)
-                                ruleArgs = appendToTailOfList(ruleArgs, v);
-						}
+						if(v->dt != DT_BOOL)
+							ruleArgs = appendToTailOfList(ruleArgs, v);
 					}
+				}
 //				}
 			}
 
