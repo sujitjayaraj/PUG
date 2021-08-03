@@ -2413,7 +2413,9 @@ static List*createGPReducedMoveRules(int getMatched, List* negedbRules, List* ed
 //				if (!searchListNode(ruleArgs, n))
 //				{
 				if(isA(n, Constant))
+				{
 					ruleArgs = appendToTailOfList(ruleArgs, n);
+				}
 				else
 				{
 					if(isA(n, DLVar))
@@ -2475,13 +2477,17 @@ static List*createGPReducedMoveRules(int getMatched, List* negedbRules, List* ed
 							newRuleBody = appendToTailOfList(newRuleBody,a);
 					}
 					else
+					{
 						newRuleBody = appendToTailOfList(newRuleBody,a);
+					}
 
 					atPos++;
 				}
 			}
 			else
+			{
 				newRuleBody = copyObject(r->body);
+			}
 
 			// rule_i -> goal_i_j -> posR/negR -> posR
 			FOREACH(DLAtom,a,newRuleBody)
@@ -2499,7 +2505,9 @@ static List*createGPReducedMoveRules(int getMatched, List* negedbRules, List* ed
 					FOREACH(Node,n,a->args)
 					{
 						if(isA(n, Constant))
+						{
 							woBoolArgs = appendToTailOfList(woBoolArgs,n);
+						}
 						else
 						{
 							DLVar *v = NULL;
