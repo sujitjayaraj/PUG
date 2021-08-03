@@ -48,12 +48,12 @@ typedef struct List
 #define FOREACH(_type_,_node_,_list_) \
     INJECT_VAR(ListCell*,DUMMY_LC(_node_)) \
 	for(_type_ *_node_ = (_type_ *)(((DUMMY_LC(_node_) = \
-			getHeadOfList(_list_)) != NULL) ? \
-				DUMMY_LC(_node_)->data.ptr_value : NULL); \
-				DUMMY_LC(_node_) != NULL; \
-		_node_ = (_type_ *)(((DUMMY_LC(_node_) = \
-			DUMMY_LC(_node_)->next) != NULL) ? \
-			DUMMY_LC(_node_)->data.ptr_value : NULL))
+				getHeadOfList(_list_)) != NULL) ? \
+					DUMMY_LC(_node_)->data.ptr_value : NULL); \
+			DUMMY_LC(_node_) != NULL; \
+			_node_ = (_type_ *)(((DUMMY_LC(_node_) = \
+					DUMMY_LC(_node_)->next) != NULL) ? \
+					DUMMY_LC(_node_)->data.ptr_value : NULL))
 
 #define FOREACH_GET_LC(_node_) (DUMMY_LC(_node_))
 #define FOREACH_HAS_MORE(_node_) (DUMMY_LC(_node_)->next != NULL)
