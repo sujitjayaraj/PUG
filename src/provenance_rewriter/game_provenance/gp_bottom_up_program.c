@@ -116,27 +116,24 @@ createBottomUpGPprogram (DLProgram *p)
 		FOREACH(DLDomain,d,p->doms)
 			domHead = appendToTailOfList(domHead,d->name);
 
-//    // store original input rule for summarization process
-//    if (p->sumOpts != NIL)
-//    {
-    	FOREACH(DLRule,or,p->rules)
-		{
+    // store original input rule for summarization process
+	FOREACH(DLRule,or,p->rules)
+	{
 //    		DLRule *copyOr = copyObject(or);
-   			if(!searchListString(domHead,or->head->rel))
-   				origDLrules = appendToTailOfList(origDLrules, copyObject(or));
+		if(!searchListString(domHead,or->head->rel))
+			origDLrules = appendToTailOfList(origDLrules, copyObject(or));
 
-   			// TODO: improve for UNION with multi-level queries
-   			if(head == NULL)
-   				head = or->head;
-   			else
-   			{
-   				if(streq(head->rel,or->head->rel))
-   					isUnion = TRUE;
-   				else
-   					head = NULL;
-   			}
+		// TODO: improve for UNION with multi-level queries
+		if(head == NULL)
+			head = or->head;
+		else
+		{
+			if(streq(head->rel,or->head->rel))
+				isUnion = TRUE;
+			else
+				head = NULL;
 		}
-//    }
+	}
 
     // mark the program has UNION
     DL_SET_BOOL_PROP(p,DL_UNION_QUERY);

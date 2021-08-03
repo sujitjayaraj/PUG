@@ -50,7 +50,7 @@ typedef struct List
     for(_type_ *_node_ = (_type_ *)(((DUMMY_LC(_node_) = \
     		getHeadOfList(_list_)) != NULL) ? \
                     DUMMY_LC(_node_)->data.ptr_value : NULL); \
-            DUMMY_LC(_node_) != NULL; \
+                    DUMMY_LC(_node_) != NULL; \
            _node_ = (_type_ *)(((DUMMY_LC(_node_) = \
                     DUMMY_LC(_node_)->next) != NULL) ? \
                     DUMMY_LC(_node_)->data.ptr_value : NULL))
