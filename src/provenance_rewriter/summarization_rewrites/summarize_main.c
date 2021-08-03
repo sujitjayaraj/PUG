@@ -282,7 +282,7 @@ rewriteSummaryOutput (Node *rewrittenTree, HashMap *summOpts, ProvQuestion qType
 	 * store edge relation in separate
 	 * TODO: not safe to check whether input comes from dl or SQL
 	 */
-	Node *moveRels = NULL;
+//	Node *moveRels = NULL;
 
 	if(isA(rewrittenTree,List))
 	{
@@ -290,7 +290,7 @@ rewriteSummaryOutput (Node *rewrittenTree, HashMap *summOpts, ProvQuestion qType
 		/* if(isA(getHeadOfListP((List *) rewrittenTree), DuplicateRemoval)) */
 		{
 			isDL = TRUE;
-			moveRels = (Node *) getTailOfListP((List *) rewrittenTree);
+//			moveRels = (Node *) getTailOfListP((List *) rewrittenTree);
 
 			// remove move rels from the input
 			List *withTail = (List *) copyObject(rewrittenTree);
