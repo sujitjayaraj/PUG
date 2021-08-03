@@ -110,7 +110,7 @@ createBottomUpGPprogram (DLProgram *p)
 	
 	List *domHead = NIL;
 	DLAtom *head = NULL;
-    boolean isUnion = FALSE;
+//    boolean isUnion = FALSE;
 
 	if(!LIST_EMPTY(p->doms))
 		FOREACH(DLDomain,d,p->doms)
@@ -128,10 +128,10 @@ createBottomUpGPprogram (DLProgram *p)
 			head = or->head;
 		else
 		{
-			if(streq(head->rel,or->head->rel))
-				isUnion = TRUE;
-			else
-				head = NULL;
+//			if(streq(head->rel,or->head->rel))
+//				isUnion = TRUE;
+//			else
+			head = NULL;
 		}
 	}
 
