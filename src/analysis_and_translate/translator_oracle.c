@@ -538,7 +538,7 @@ translateQueryBlock(QueryBlock *qb)
 
     QueryOperator *orderBy = translateOrderBy(qb, distinct, attrsOffsets);
     if (orderBy != distinct)
-        LOG_TRANSLATED_OP("translatedOrder is", orderBy);
+    	LOG_TRANSLATED_OP("translatedOrder is", orderBy);
 
 	QueryOperator *limitAndOffset = translateLimitOffset(qb, orderBy, attrsOffsets);
 	if (limitAndOffset != orderBy)
