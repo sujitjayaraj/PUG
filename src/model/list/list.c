@@ -495,13 +495,16 @@ stringListToConstList(List *list)
 List *
 concatTwoLists(List *lista, List*listb)
 {
-    if (lista == listb)
+    if (lista == listb) {
     	listb = copyList(listb);
+    }
 
-	if (lista == NIL)
+	if (lista == NIL) {
 		return  listb;
-	if (listb == NIL)
+	}
+	if (listb == NIL) {
 		return lista;
+	}
 
     ASSERT(lista->type == listb->type);
 
