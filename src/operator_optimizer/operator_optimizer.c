@@ -1665,7 +1665,7 @@ pullup(QueryOperator *op, List *duplicateattrs, List *normalAttrNames)
                 				name = (char *) n;
                 				if(streq(name, attrName))
                 				{
-//                					type = (DataType) t; // no longer cast from Node to DataType
+                					type = (DataType) t; //no longer cast from Node to DataType
 
                 					AttributeDef *a = getAttrDefByName(opChild,name);
                 					type = a->dataType;

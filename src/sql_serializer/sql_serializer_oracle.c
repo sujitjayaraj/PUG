@@ -697,8 +697,9 @@ serializeQueryBlock (QueryOperator *q, StringInfo str)
         appendStringInfoString(str, havingString->data);
 
     if (STRINGLEN(orderString) > 0)
+    {
         appendStringInfoString(str, orderString->data);
-
+    }
 	if (matchInfo->limitOffset != NULL) {
 		serializeLimit(str, matchInfo->limitOffset);
 	}
