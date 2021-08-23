@@ -220,13 +220,13 @@ createWhyGPprogram (DLProgram *p, DLAtom *why)
 
     enumerateRules (p);
     solvedProgram = copyObject(p);
-    solvedProgram = unifyProgram(solvedProgram, why);
-    solvedProgram = solveProgram(solvedProgram, why, FALSE);
+    solvedProgram = unifyProgram(solvedProgram, why); // Step1
+    solvedProgram = solveProgram(solvedProgram, why, FALSE); // Step2
 
     p->n.properties = NULL;
     setDLProp((DLNode *) solvedProgram, DL_PROV_PROG, (Node *) p);
 
-    solvedProgram = rewriteSolvedProgram(solvedProgram);
+    solvedProgram = rewriteSolvedProgram(solvedProgram); // Step3 - 5
     DL_DEL_PROP(solvedProgram, DL_PROV_WHY);
 
     INFO_LOG("program for computing Why-prov: %s",
