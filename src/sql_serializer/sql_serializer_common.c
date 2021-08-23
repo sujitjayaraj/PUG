@@ -422,19 +422,29 @@ genSerializeQueryBlock (QueryOperator *q, StringInfo str, SerializeClausesAPI *a
     appendStringInfoString(str, fromString->data);
 
     if (STRINGLEN(whereString) > 0)
+    {
         appendStringInfoString(str, whereString->data);
+    }
 
     if (STRINGLEN(groupByString) > 0)
+    {
         appendStringInfoString(str, groupByString->data);
+    }
 
     if (STRINGLEN(havingString) > 0)
+    {
         appendStringInfoString(str, havingString->data);
+    }
 
 	if (STRINGLEN(orderString) > 0)
+	{
 		appendStringInfoString(str, orderString->data);
+	}
 
 	if (STRINGLEN(limitOffsetString) > 0)
+	{
 		appendStringInfoString(str, limitOffsetString->data);
+	}
 
     FREE(matchInfo);
 
