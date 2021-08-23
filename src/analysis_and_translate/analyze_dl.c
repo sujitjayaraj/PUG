@@ -174,7 +174,9 @@ analyzeSummerizationBasics (DLProgram *p)
 
     // only continue if summarization was requested
     if (p->sumOpts == NIL)
+    {
         return;
+    }
 
 	DEBUG_LOG("user asked for summarization");
 	
