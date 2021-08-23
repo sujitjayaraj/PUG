@@ -1653,7 +1653,7 @@ pullup(QueryOperator *op, List *duplicateattrs, List *normalAttrNames)
                 		projAttrNames = appendToTailOfList(projAttrNames, attrName);
 
                 		// (2.2)
-                		List *childType = getDataTypes(opChild->schema);
+//                		List *childType = getDataTypes(opChild->schema);
                 		List *childName = getAttrNames(opChild->schema);
 
                 		FOREACH(char, attrName, LostNormalList)
