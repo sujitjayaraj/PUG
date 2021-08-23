@@ -1660,7 +1660,8 @@ pullup(QueryOperator *op, List *duplicateattrs, List *normalAttrNames)
                 		{
                 			DataType type = DT_INT;
                 			char *name = NULL;
-                			FORBOTH(Node, t, n, childType, childName)
+//                			FORBOTH(Node, t, n, childType, childName)
+                			FOREACH(Node,n,childName)
                 			{
                 				name = (char *) n;
                 				if(streq(name, attrName))
