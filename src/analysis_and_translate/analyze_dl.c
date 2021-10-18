@@ -173,11 +173,10 @@ analyzeSummerizationBasics (DLProgram *p)
     ProvQuestion qType = PROV_Q_WHY;
 
     // only continue if summarization was requested
-    if (p->sumOpts == NIL)
+    if (p->sumOpts == NIL) 
     {
         return;
     }
-
 	DEBUG_LOG("user asked for summarization");
 	
     // either why or why-not

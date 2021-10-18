@@ -373,7 +373,6 @@ analyzeQueryBlock (QueryBlock *qb, List *parentFroms)
     {
         analyzeWhere(qb, parentFroms);
     }
-
 	// check limit and offset
 	analyzeLimitAndOffset(qb);
 

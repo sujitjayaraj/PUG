@@ -706,7 +706,6 @@ serializeQueryBlock (QueryOperator *q, StringInfo str)
     {
         appendStringInfoString(str, orderString->data);
     }
-
 	if (matchInfo->limitOffset != NULL) {
 		serializeLimit(str, matchInfo->limitOffset);
 	}
